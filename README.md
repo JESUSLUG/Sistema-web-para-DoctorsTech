@@ -65,3 +65,127 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+##Montar el proyecto
+
+Como montar el proyecto de Sistema-web-para-DoctorsTech
+
+Primero, este proyecto se alojará en 000webHost.
+
+Segundo, se utilizará la capa gratuita de esta plataforma.
+
+Como primer paso, debes descomprimir el proyecto en el apartado de archivos de tu sitio en 000webHost. Dado que esta plataforma no permite descomprimir archivos de manera sencilla, es necesario usar la siguiente herramienta. Descárgala y súbela al gestor de archivos del servidor web para descomprimir el archivo de nuestro proyecto:
+
+[Unzipper](https://github.com/ndeet/unzipper)
+
+Es importante destacar que el archivo ZIP de nuestro proyecto debe estar ubicado en la carpeta `public_html`. Una vez descomprimido en esta carpeta, deberás moverlo a la raíz del gestor de archivos. siendo “/”
+
+
+Luego de haber movido todos los archivos de nuestro ZIP con éxito, podemos eliminar la carpeta `public_html`, ya que ya no nos será útil. Ahora, la carpeta del proyecto llamada `public` se renombrará a `public_html`.
+
+Luego, ve al archivo `/app/Providers/AppServiceProvider.php` y agrega el siguiente código al método `register()`:
+
+```php
+$this->app->bind('path.public', function () {
+    return base_path('public_html');
+});
+```
+
+En el caso de este proyecto, quedaría algo así:
+
+```php
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        // Redefinir la ruta pública a 'public_html'
+        $this->app->bind('path.public', function () {
+            return base_path('public_html');
+        });
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        //
+    }
+}
+```
+
+---
+
+Ahora, es momento de localizar el archivo `.env`, abrirlo y copiar el valor de `APP_KEY` sin incluir 'base64:'.
+
+Después, dirigámonos a `/config/app.php`, ubicamos 'key' y lo pegamos, quedando algo así:
+
+```php
+'key' => env('APP_KEY', 'base64:KWBoDfFLTavQlKBBwBMsg6sabKVJAROZU4730fy3LKo='),
+'cipher' => 'AES-256-CBC',
+```
+
+—
+
+
+---
+
+Ahora procederemos a modificar la base de datos MySQL. Utilizaremos la que ofrece 000webhost. Creamos la base de datos con los siguientes datos:
+
+- Nombre: id1234_pruebas
+- Usuario: id1234_user
+- Host: localhost
+- Contraseña: 1234
+
+Una vez obtenidos estos datos, nos dirigiremos a `/config/database.php` y localizaremos la sección de MySQL para sustituir los datos por los de nuestra nueva base de datos:
+
+```php
+'mysql' => [
+    'driver' => 'mysql',
+    'url' => env('DATABASE_URL'),
+    'host' => env('DB_HOST', 'localhost'),
+    'port' => env('DB_PORT', '3306'),
+    'database' => env('DB_DATABASE', 'id1234_pruebas'),
+    'username' => env('DB_USERNAME', 'id1234_user'),
+    'password' => env('DB_PASSWORD', '1234'),
+    'unix_socket' => env('DB_SOCKET', ''),
+    'charset' => 'utf8mb4',
+    'collation' => 'utf8mb4_unicode_ci',
+    'prefix' => '',
+    'prefix_indexes' => true,
+    'strict' => true,
+    'engine' => null,
+    'options' => extension_loaded('pdo_mysql') ? array_filter([
+        PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+    ]) : [],
+],
+```
+
+Y en nuestro archivo `.env`, ubicamos la sección para MySQL y la modificamos de la siguiente manera:
+
+```
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=id1234_pruebas
+DB_USERNAME=id1234_user
+DB_PASSWORD=1234
+```
+
+—
+
+Para finazliar no olvides ir a /bootstrap/cache y eliminar todo menos el .gitignore.
+
+Recuerda que el proyecto se inicia yendose a puiblic_html index.php y si todo esta bien, con la misma URL que genera 000webHsot
+
+
